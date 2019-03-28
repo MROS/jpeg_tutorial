@@ -3,24 +3,6 @@ use crate::image::Image;
 use std::io::BufReader;
 use std::fs::File;
 use std::io::Read;
-use std::collections::HashMap;
-
-enum Marker {
-    SOI = 0xD8,      
-    EOI = 0xD9,      
-
-    APP0 = 0xE0,
-
-    DQT = 0xDB,
-    DHT = 0xC4,
-
-    SOS = 0xDA,
-
-    SOF = 0xC0,
-
-    COM = 0xFE,
-
-}
 
 fn marker_info(marker: u8) -> String {
     match marker {
