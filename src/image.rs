@@ -12,7 +12,7 @@ impl Image {
         return Image{
             width: width,
             height: height,
-            pixels: vec![vec![Color::RGB(255, 0, 0); 500]; 50]
+            pixels: vec![vec![Color::RGB(0, 0, 0); width as usize]; height as usize]
         };
     }
 }

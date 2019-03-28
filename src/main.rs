@@ -1,10 +1,10 @@
 mod image;
 mod display;
+mod decoder;
 
 use image::Image;
 use display::display_image;
-
-use sdl2::pixels::Color;
+use decoder::decoder;
 
 use std::env;
 use std::fs::File;
@@ -18,21 +18,14 @@ fn main() -> std::io::Result<()> {
         return Ok(());
     }
     let filename = &args[1];
-    println!("嘗試解碼 {}", filename);
 
     let mut f = File::open(filename)?;
-    let mut buffer = [0; 10];
+    let mut buffer: Vec<u8> = Vec::new();
 
-    f.read(&mut buffer)?;
-    println!("{:?}", buffer);
+    f.read_to_end(&mut buffer)?;
 
-    let mut image = Image::new(500, 50);
-    for row in 0..image.height {
-        for col in 0..image.width {
-            let gray: u8 = (col * 255 / image.width) as u8;
-            image.pixels[row as usize][col as usize] = Color::RGB(gray, gray, gray);
-        }
-    }
+    let image: Image = decoder(buffer);
+
     display_image(image);
     Ok(())
 }
