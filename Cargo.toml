@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 sdl2 = "0.32.1"
+clap = "2.32.0"
