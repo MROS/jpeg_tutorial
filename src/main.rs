@@ -8,7 +8,6 @@ use display::display_image;
 use decoder::decoder;
 use marker::marker_detector;
 
-use std::env;
 use std::fs::File;
 use std::io::BufReader;
 

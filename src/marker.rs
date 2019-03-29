@@ -1,5 +1,3 @@
-use crate::image::Image;
-
 use std::io::BufReader;
 use std::fs::File;
 use std::io::Read;
