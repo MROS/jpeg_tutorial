@@ -2,3 +2,5 @@
 *.swp
 
 target/
+
+.vscode/
