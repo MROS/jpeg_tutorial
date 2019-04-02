@@ -162,7 +162,7 @@ fn read_sof0(reader: &mut BufReader<File>) -> SofInfo {
                 sof_info.Cr = read_sof0_component(reader);
             },
             other => {
-                println!("不符合規範的 sof0 component: {}", other);
+                println!("不符合規範的 SOF0 component: {}", other);
             }
         }
     }
