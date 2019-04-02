@@ -12,7 +12,7 @@ const MARKER_PREFIX: u8 = 0xFF;
 const SOI_MARKER: u8 = 0xD8;      // start of image, 圖片起始
 const EOI_MARKER: u8 = 0xD9;      // end of image, 圖片結束
 
-const APP0_MARKER: u8 = 0xE0;     // APP0, 記錄影像的長、寬等等基本資訊
+const APP0_MARKER: u8 = 0xE0;     // APP0, JFIF 的額外資訊
 
 const DQT_MARKER: u8 = 0xDB;      // DQT, define quantization table, 定義量化表
 const DHT_MARKER: u8 = 0xC4;      // DHT, define huffman table, 定義霍夫曼表
