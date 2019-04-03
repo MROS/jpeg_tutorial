@@ -7,6 +7,8 @@ use std::io::Seek;
 use std::default::Default;
 use std::io::SeekFrom;
 
+use std::collections::HashMap;
+
 const MARKER_PREFIX: u8 = 0xFF;
 
 const SOI_MARKER: u8 = 0xD8;      // start of image, 圖片起始
@@ -17,16 +19,36 @@ const APP0_MARKER: u8 = 0xE0;     // APP0, JFIF 的額外資訊
 const DQT_MARKER: u8 = 0xDB;      // DQT, define quantization table, 定義量化表
 const DHT_MARKER: u8 = 0xC4;      // DHT, define huffman table, 定義霍夫曼表
 
-const SOF0_MARKER: u8 = 0xC0;      // SOF, start of frame(baseline)
+const SOF0_MARKER: u8 = 0xC0;     // SOF, start of frame(baseline)
 const SOS_MARKER: u8 = 0xDA;      // SOS, start of scan, 壓縮的數據由此開始
 
 // const COM_MARKER: u8 = 0xFE;      // COM, comment, 註解
 
-#[derive(Default)]
-struct MetaData {
+const DC: u8 = 0x00;            // DHT 中表示直流
+const AC: u8 = 0x01;            // DHT 中表示交流
+
+struct JPEGData {
     app_info: AppInfo,
     sof_info: SofInfo,
-    // quant_table: [[u16; 64]; 4]
+    huffman_tables: HuffmanTable,
+    quant_tables: [[u16; 64]; 4]
+}
+
+impl JPEGData {
+    fn new() -> JPEGData {
+        JPEGData {
+            app_info: Default::default(),
+            sof_info: Default::default(),
+            huffman_tables: Default::default(),
+            quant_tables: [[0; 64]; 4]
+        }
+    }
+}
+
+#[derive(Default, Debug)]
+struct HuffmanTable {
+    dc_tables: [HashMap<(u8, u16), u8>; 2],
+    ac_tables: [HashMap<(u8, u16), u8>; 2]
 }
 
 #[derive(Default, Debug)]
@@ -96,6 +118,44 @@ fn read_app0(reader: &mut BufReader<File>) -> AppInfo {
     reader.seek(SeekFrom::Current(thumbnail_length));
 
     return app_info;
+}
+
+// 回傳值爲 (AC/DC, 編號, 霍夫曼表)
+// 使用 hashmap 來儲存碼字與信源符號的對應關係
+// 01 跟 1 雖然在編碼上代表不同含義，但是無法在數字上表示出來
+// 必須再增加一個編碼長度的資訊，才能夠分辨開來，所以我將一個編碼表示爲一個 tuple
+// 有很多優化的方式，例如使用二元樹，但本處爲了程式碼清晰不優化
+fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>)> {
+    let mut ret = Vec::new();
+
+    let mut len = read_u16(reader);
+    println!("len {}", len);
+    len -= 2;
+    while len > 0 {
+        let c = read_u8(reader);
+        let ac_dc = c >> 4;
+        let id = c & 0x0F;
+        let mut map = HashMap::new();
+        let mut height_info: [u8; 16] = [0; 16];
+        reader.read_exact(&mut height_info);
+        println!("{:?}", height_info);
+        len -= 17;
+
+        let mut code = 0;
+        for h in 0..16 {
+            for i in 0..height_info[h] {
+                let source_symbol = read_u8(reader);
+                map.insert(((h + 1) as u8, code), source_symbol);
+                println!("{} {:#X}", code, source_symbol);
+                code += 1;
+                len -= 1;
+            }
+            code <<= 1;            // *= 2
+        }
+        ret.push((ac_dc, id, map));
+    }
+
+    return ret;
 }
 
 fn read_dqt(reader: &mut BufReader<File>) -> (usize, [u16; 64]) {
@@ -168,6 +228,7 @@ fn read_sof0(reader: &mut BufReader<File>) -> SofInfo {
     }
     return sof_info;
 }
+
 // fn read_useless_section(reader: &mut BufReader<File>) {
 //     let len = read_u16(reader);
 //     println!("len {}", len);
@@ -177,7 +238,7 @@ fn read_sof0(reader: &mut BufReader<File>) -> SofInfo {
 pub fn decoder(mut reader: BufReader<File>) -> Image {
     let mut c: [u8; 1] = [0; 1];
 
-    let mut meta_data: MetaData = Default::default();
+    let mut jpeg_data: JPEGData = JPEGData::new();
 
     loop {
         reader.read(&mut c);
@@ -197,28 +258,31 @@ pub fn decoder(mut reader: BufReader<File>) -> Image {
             },
             SOF0_MARKER => {
                 println!("掃過 SOF marker");
-                meta_data.sof_info = read_sof0(&mut reader);
-                println!("sof_info: {:#?}", meta_data.sof_info);
-                break;
-            }
+                jpeg_data.sof_info = read_sof0(&mut reader);
+                println!("sof_info: {:#?}", jpeg_data.sof_info);
+            },
             APP0_MARKER => {
                 println!("掃過 APP0 marker");
-                meta_data.app_info = read_app0(&mut reader);
-                println!("app_info: {:#?}", meta_data.app_info);
+                jpeg_data.app_info = read_app0(&mut reader);
+                println!("app_info: {:#?}", jpeg_data.app_info);
+            },
+            DHT_MARKER => {
+                println!("掃過 DHT marker");
+                let huffman_tables = read_dht(&mut reader);
             },
             DQT_MARKER => {
                 println!("掃過 DQT marker");
-                read_dqt(&mut reader);
-            }
+                let (id, table) = read_dqt(&mut reader);
+                jpeg_data.quant_tables[id] = table;
+            },
             0x00 => {
 
-            }
+            },
             m => {
                 println!("other marker: {:#X?}", m);
                 // read_useless_section(&mut reader);
             }
         }
-
     }
 
     return Image::new(800, 600);
