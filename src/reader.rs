@@ -91,7 +91,7 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
 
         let mut code = 0;
         for h in 0..16 {
-            for i in 0..height_info[h] {
+            for _ in 0..height_info[h] {
                 let source_symbol = read_u8(reader);
                 map.insert(((h + 1) as u8, code), source_symbol);
                 println!("{} {:#X}", code, source_symbol);
@@ -224,7 +224,7 @@ impl<'a> BitStream<'a> {
     }
     fn read_dc(&mut self, map: &HashMap<(u8, u16), u8>, id: usize) -> f32 {
         let code_len = self.matchHuffman(map);
-        if code_len == 0 { return 0.0; }
+        if code_len == 0 { return self.last_dc[id]; }
         self.last_dc[id] += self.read_value(code_len);
         return self.last_dc[id];
     }
@@ -312,7 +312,6 @@ fn read_mcus(reader: &mut BufReader<File>, jpeg_meta_data: &JPEGMetaData) -> Vec
     let mut MCUs = vec![vec![Default::default(); w as usize]; h as usize];
     for i in 0..h {
         for j in 0..w {
-            println!("讀取 MCU {} {}", i, j);
             MCUs[i as usize][j as usize] = read_mcu(&mut bits, jpeg_meta_data);
         }
     }

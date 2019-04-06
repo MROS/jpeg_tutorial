@@ -52,6 +52,16 @@ impl<'a> MCUWrap<'a> {
     fn new( mcu: MCU, jpeg_meta_data: &'a JPEGMetaData) -> MCUWrap<'a> {
         return MCUWrap{ mcu, jpeg_meta_data };
     }
+    fn display(&mut self, id: usize, h: usize, w: usize) {
+        println!("mcu {} {} {}", id, h, w);
+        let block = &self.mcu[id][h][w];
+        for i in 0..8 {
+            for j in 0..8 {
+                print!("{} ", block[i][j]);
+            }
+            println!("");
+        }
+    }
     fn decode(&mut self) {
         let sof_info = &self.jpeg_meta_data.sof_info;
         let component_infos = &sof_info.component_infos;
@@ -61,12 +71,17 @@ impl<'a> MCUWrap<'a> {
             let c_info = &component_infos[id];
             for h in 0..(c_info.vertical_sampling as usize) {
                 for w in 0..(c_info.horizontal_sampling as usize) {
+
+                    // println!("原始 mcu");
+                    // self.display(id, h, w);
                     // 反量化
                     for i in 0..8 {
                         for j in 0..8 {
                             self.mcu[id][h][w][i][j] *= quant_tables[c_info.quant_table_id as usize][i*8 + j];
                         }
                     }
+                    // println!("反量化之後");
+                    // self.display(id, h, w);
                     // zigzag
                     let mut tmp: [[f32; 8]; 8] = Default::default();
                     for i in 0..8 {
@@ -75,6 +90,8 @@ impl<'a> MCUWrap<'a> {
                         }
                     }
                     self.mcu[id][h][w] = tmp;
+                    // println!("zigzag 之後");
+                    // self.display(id, h, w);
                     // 反向離散餘弦變換（idct）
                     tmp = Default::default();
                     for i in 0..8 {
@@ -90,6 +107,8 @@ impl<'a> MCUWrap<'a> {
                         }
                     }
                     self.mcu[id][h][w] = tmp;
+                    // println!("離散餘弦變換之後");
+                    // self.display(id, h, w);
                 }
             }
         }
@@ -99,21 +118,23 @@ impl<'a> MCUWrap<'a> {
 
         let sof_info = &self.jpeg_meta_data.sof_info;
         let component_infos = &sof_info.component_infos;
-        let mcu_height = 8 * sof_info.max_vertical_sampling;
-        let mcu_width = 8 * sof_info.max_horizontal_sampling;
+        let max_vertical_sampling = sof_info.max_vertical_sampling;
+        let max_horizontal_sampling = sof_info.max_horizontal_sampling;
+        let mcu_height = 8 * max_vertical_sampling;
+        let mcu_width = 8 * max_horizontal_sampling;
 
-        let mut ret = vec![vec![Color::RGB(128, 128, 128); mcu_width as usize]; mcu_height as usize];
+        let mut ret = vec![vec![Color::RGB(0, 0, 0); mcu_width as usize]; mcu_height as usize];
         for i in 0..mcu_height {
             for j in 0..mcu_width {
                 // 獲取 Y, Cb, Cr 三個顏色分量所對應的採樣
                 let mut YCbCr = [0.0; 3];
                 for id in 0..3 {
-                    let vh = (i * component_infos[0].vertical_sampling / mcu_height) as usize;
-                    let vw = (j * component_infos[0].horizontal_sampling / mcu_width) as usize;
+                    let vh = (i * component_infos[id].vertical_sampling / max_vertical_sampling) as usize;
+                    let vw = (j * component_infos[id].horizontal_sampling / max_horizontal_sampling) as usize;
                     YCbCr[id] = self.mcu[id][vh / 8][vw / 8][vh % 8][vw % 8];
                 }
-                // let (Y, Cb, Cr) = (YCbCr[0], YCbCr[1], YCbCr[2]);
-                let (Y, Cb, Cr) = (YCbCr[0], 0.0, 0.0);
+                let (Y, Cb, Cr) = (YCbCr[0], YCbCr[1], YCbCr[2]);
+                // let (Y, Cb, Cr) = (YCbCr[0], 0.0, 0.0);
                 let R = chomp(Y + 1.402*Cr + 128.0);
                 let G = chomp(Y - 0.34414*Cb - 0.71414*Cr + 128.0);
                 let B = chomp(Y + 1.772*Cb + 128.0);
@@ -135,16 +156,13 @@ pub fn decoder(reader: BufReader<File>) -> Image {
     let mcu_width_number = ((sof_info.width as usize - 1) / mcu_width + 1) as usize;
     // 高度上有幾個 MCU
     let mcu_height_number = ((sof_info.height as usize - 1) / mcu_height + 1) as usize;
-    println!("mcu number {} {}", mcu_width_number, mcu_height_number);
 
     let image_width = (mcu_width_number * mcu_width) as u32;
     let image_height = (mcu_height_number * mcu_height) as u32;
-    println!("圖像寬高： {} {}", image_width, image_height);
     let mut image = Image::new(image_width, image_height);
 
     for h in 0..mcu_height_number {
         for w in 0..mcu_width_number {
-            println!("mcu {} {}", w, h);
             let mcu = MCUs[h][w].clone();
             let mcu_rgb = MCUWrap::new(mcu, &jpeg_meta_data).toRGB();
             for y in 0..mcu_height {
@@ -154,6 +172,7 @@ pub fn decoder(reader: BufReader<File>) -> Image {
             }
         }
     }
-    
+
+    // MCUWrap::new(MCUs[20][20].clone(), &jpeg_meta_data).toRGB();
     return image;
 }
