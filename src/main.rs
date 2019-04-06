@@ -2,11 +2,14 @@ mod image;
 mod display;
 mod decoder;
 mod marker;
+mod reader;
+mod primitives;
 
 use image::Image;
 use display::display_image;
 use decoder::decoder;
 use marker::marker_detector;
+use reader::data_reader;
 
 use std::fs::File;
 use std::io::BufReader;
@@ -27,22 +30,22 @@ fn main() -> std::io::Result<()> {
                                .long("marker")
                                .multiple(true)
                                .help("是否僅打印 marker"))
+                          .arg(Arg::with_name("reader")
+                               .short("r")
+                               .long("reader")
+                               .multiple(true)
+                               .help("是否僅解碼檔案，不顯示"))
                           .get_matches();
-    // let args: Vec<String> = env::args().collect();
-    // let length = args.len();
-    // if length != 2 {
-    //     println!("用法：cargo run XXX.jpg");
-    //     return Ok(());
-    // }
+
     let filename = matches.value_of("path").unwrap();
 
     let f = File::open(filename)?;
     let reader = BufReader::new(f);
 
     if matches.is_present("marker") {
-
-        marker_detector(reader);
-
+        marker_detector(reader)?;
+    } else if matches.is_present("reader") {
+        data_reader(reader);
     } else {
         // 沒有額外參數，直接解碼並顯示
         let image: Image = decoder(reader);
