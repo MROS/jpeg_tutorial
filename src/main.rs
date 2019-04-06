@@ -29,12 +29,12 @@ fn main() -> std::io::Result<()> {
                                .short("m")
                                .long("marker")
                                .multiple(true)
-                               .help("是否僅打印 marker"))
+                               .help("僅打印 marker"))
                           .arg(Arg::with_name("reader")
                                .short("r")
                                .long("reader")
                                .multiple(true)
-                               .help("是否僅解碼檔案，不顯示"))
+                               .help("僅解碼檔案，不顯示"))
                           .get_matches();
 
     let filename = matches.value_of("path").unwrap();

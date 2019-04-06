@@ -4,8 +4,8 @@ pub struct JPEGMetaData {
     pub app_info: AppInfo,
     pub sof_info: SofInfo,
     pub huffman_tables: HuffmanTable,
-    pub quant_tables: [[u16; 64]; 4],
-    pub table_mapping: [(usize, usize); 3]
+    pub quant_tables: [[f32; 64]; 4],
+    pub table_mapping: [(usize, usize); 3],
 }
 
 impl JPEGMetaData {
@@ -14,20 +14,13 @@ impl JPEGMetaData {
             app_info: Default::default(),
             sof_info: Default::default(),
             huffman_tables: Default::default(),
-            quant_tables: [[0; 64]; 4],
-            table_mapping: Default::default()
+            quant_tables: [[0.0; 64]; 4],
+            table_mapping: Default::default(),
         }
     }
 }
 
-#[derive(Clone, Default)]
-pub struct Block(pub [[f32; 8]; 8]);
-
-impl Block {
-    fn quantify(&self) {
-
-    }
-}
+pub type Block = [[f32; 8]; 8];
 
 pub type MCU = [Vec<Vec<Block>>; 3];
 
@@ -49,7 +42,9 @@ pub struct SofInfo {
     pub precision: u8,
     pub height: u16,
     pub width: u16,
-    pub component_infos: [ComponentInfo; 3]
+    pub component_infos: [ComponentInfo; 3],
+    pub max_horizontal_sampling: u8,
+    pub max_vertical_sampling: u8
 }
 
 // APP0 section 下的資料

@@ -106,7 +106,7 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
     return ret;
 }
 
-fn read_dqt(reader: &mut BufReader<File>) -> (usize, [u16; 64]) {
+fn read_dqt(reader: &mut BufReader<File>) -> (usize, [f32; 64]) {
     let len = read_u16(reader);
     println!("區段長度 {} bytes", len);
     let c = read_u8(reader);
@@ -114,14 +114,14 @@ fn read_dqt(reader: &mut BufReader<File>) -> (usize, [u16; 64]) {
     let precision = c >> 4;
     println!("量化表 {} ，精度爲 {}", id, precision);
 
-    let mut table = [0; 64];
+    let mut table = [0.0; 64];
     if precision == 0 {
         for i in 0..64 {
-           table[i] = read_u8(reader) as u16;
+           table[i] = f32::from(read_u8(reader));
         }
     } else if precision == 1 {
         for i in 0..64 {
-           table[i] = read_u16(reader);
+           table[i] = f32::from(read_u16(reader));
         }
     } else {
         println!("量化表 {} 精度爲 {}，不符合規範", id, precision);
@@ -162,6 +162,9 @@ fn read_sof0(reader: &mut BufReader<File>) -> SofInfo {
         // Y => 1, Cb => 2, Cr => 3 ，將它們減 1 使的陣列索引從 0 開始
         sof_info.component_infos[component_id as usize - 1] = read_sof0_component(reader);
     }
+    sof_info.max_horizontal_sampling = sof_info.component_infos.iter().map(|x| { x.horizontal_sampling }).max().unwrap();
+    sof_info.max_vertical_sampling = sof_info.component_infos.iter().map(|x| { x.vertical_sampling }).max().unwrap();
+    println!("max horizontal sampling: {}, max vertical sampling: {}", sof_info.max_horizontal_sampling, sof_info.max_vertical_sampling);
     return sof_info;
 }
 
@@ -219,10 +222,11 @@ impl<'a> BitStream<'a> {
         ret = if first == 1 { ret } else{ -ret };
         return ret as f32;
     }
-    fn read_dc(&mut self, map: &HashMap<(u8, u16), u8>) -> f32 {
+    fn read_dc(&mut self, map: &HashMap<(u8, u16), u8>, id: usize) -> f32 {
         let code_len = self.matchHuffman(map);
         if code_len == 0 { return 0.0; }
-        return self.read_value(code_len);
+        self.last_dc[id] += self.read_value(code_len);
+        return self.last_dc[id];
     }
     fn read_ac(&mut self, map: &HashMap<(u8, u16), u8>) -> AcValue {
         let code_len = self.matchHuffman(map);
@@ -261,29 +265,29 @@ fn read_mcu(bits: &mut BitStream, jpeg_meta_data: &JPEGMetaData) -> MCU {
         for h in 0..height {
             for w in 0..width {
                 // 讀取一個 block
-                blocks[h][w].0[0][0] = bits.read_dc(dc_table);
+                blocks[h][w][0][0] = bits.read_dc(dc_table, id);
                 let mut count = 1;
                 while count < 64 {
                     let ac_value = bits.read_ac(ac_table);
                     match ac_value {
                         AcValue::SixteenZeros => {
                             for _ in 0..16 {
-                                blocks[h][w].0[count / 8][count % 8] = 0.0;
+                                blocks[h][w][count / 8][count % 8] = 0.0;
                                 count += 1;
                             }
                         }
                         AcValue::AllZeros => {
                             while count < 64 {
-                                blocks[h][w].0[count / 8][count % 8] = 0.0;
+                                blocks[h][w][count / 8][count % 8] = 0.0;
                                 count += 1;
                             }
                         }
                         AcValue::Normal { zeros, value } => {
                             for _ in 0..zeros {
-                                blocks[h][w].0[count / 8][count % 8] = 0.0;
+                                blocks[h][w][count / 8][count % 8] = 0.0;
                                 count += 1;
                             }
-                            blocks[h][w].0[count / 8][count % 8] = value;
+                            blocks[h][w][count / 8][count % 8] = value;
                             count += 1;
                         }
                     }
@@ -292,7 +296,7 @@ fn read_mcu(bits: &mut BitStream, jpeg_meta_data: &JPEGMetaData) -> MCU {
         }
         mcu[id] = blocks;
     }
-    return Default::default();
+    return mcu;
 }
 
 fn read_mcus(reader: &mut BufReader<File>, jpeg_meta_data: &JPEGMetaData) -> Vec<Vec<MCU>> {
@@ -300,17 +304,14 @@ fn read_mcus(reader: &mut BufReader<File>, jpeg_meta_data: &JPEGMetaData) -> Vec
     let image_width = sof_info.width;
     let image_height = sof_info.height;
 
-    let max_width_sampling = sof_info.component_infos.iter().map(|x| { x.horizontal_sampling }).max().unwrap();
-    let max_height_sampling = sof_info.component_infos.iter().map(|x| { x.vertical_sampling }).max().unwrap();
-    println!("max width sampling: {}, max height sampling: {}", max_width_sampling, max_height_sampling);
-    let w = (image_width - 1) / (8 * max_width_sampling as u16) + 1;     // 寬度上有 w 個 MCU
-    let h = (image_height - 1) / (8 * max_height_sampling as u16) + 1;   // 高度上有 h 個 MCU
+    let w = (image_width - 1) / (8 * sof_info.max_horizontal_sampling as u16) + 1;     // 寬度上有 w 個 MCU
+    let h = (image_height - 1) / (8 * sof_info.max_vertical_sampling as u16) + 1;   // 高度上有 h 個 MCU
     println!("寬度上有 {} 個 MCU ，寬度上有 {} 個 MCU", w, h);
 
     let mut bits = BitStream::new(reader);
-    let mut MCUs = vec![vec![Default::default(); h as usize]; w as usize];
-    for i in 0..w {
-        for j in 0..h {
+    let mut MCUs = vec![vec![Default::default(); w as usize]; h as usize];
+    for i in 0..h {
+        for j in 0..w {
             println!("讀取 MCU {} {}", i, j);
             MCUs[i as usize][j as usize] = read_mcu(&mut bits, jpeg_meta_data);
         }
