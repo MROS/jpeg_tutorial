@@ -6,7 +6,7 @@ mod reader;
 mod primitives;
 
 use image::Image;
-use display::display_image;
+use display::{display_image, to_ppm};
 use decoder::decoder;
 use marker::marker_detector;
 use reader::data_reader;
@@ -30,6 +30,11 @@ fn main() -> std::io::Result<()> {
                                .long("marker")
                                .multiple(true)
                                .help("僅打印 marker"))
+                          .arg(Arg::with_name("ppm")
+                               .short("p")
+                               .long("ppm")
+                               .multiple(true)
+                               .help("輸出 bmp"))
                           .arg(Arg::with_name("reader")
                                .short("r")
                                .long("reader")
@@ -46,6 +51,9 @@ fn main() -> std::io::Result<()> {
         marker_detector(reader)?;
     } else if matches.is_present("reader") {
         data_reader(reader);
+    } else if matches.is_present("ppm") {
+        let image: Image = decoder(reader);
+        to_ppm(image)?;
     } else {
         // 沒有額外參數，直接解碼並顯示
         let image: Image = decoder(reader);

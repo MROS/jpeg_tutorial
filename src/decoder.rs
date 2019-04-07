@@ -172,6 +172,7 @@ pub fn decoder(reader: BufReader<File>) -> Image {
             }
         }
     }
+    println!("rgb: {:?}", image.pixels[0][0]);
 
     // MCUWrap::new(MCUs[20][20].clone(), &jpeg_meta_data).toRGB();
     return image;
