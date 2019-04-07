@@ -49,40 +49,56 @@ struct MCUWrap<'a> {
 } 
 
 impl<'a> MCUWrap<'a> {
-    fn new( mcu: MCU, jpeg_meta_data: &'a JPEGMetaData) -> MCUWrap<'a> {
+    fn new(mcu: MCU, jpeg_meta_data: &'a JPEGMetaData) -> MCUWrap<'a> {
         return MCUWrap{ mcu, jpeg_meta_data };
     }
-    fn display(&mut self, id: usize, h: usize, w: usize) {
-        println!("mcu {} {} {}", id, h, w);
-        let block = &self.mcu[id][h][w];
-        for i in 0..8 {
-            for j in 0..8 {
-                print!("{} ", block[i][j]);
+    fn display(&mut self) {
+        let sof_info = &self.jpeg_meta_data.sof_info;
+        let component_infos = &sof_info.component_infos;
+        let m = ["Y", "Cb", "Cr"];
+        for id in 0..3 {
+            let c_info = &component_infos[id];
+            for h in 0..(c_info.vertical_sampling as usize) {
+                for w in 0..(c_info.horizontal_sampling as usize) {
+                    println!("------ {} 顏色分量 {} {} ------", m[id], h, w);
+                    let block = &self.mcu[id][h][w];
+                    for i in 0..8 {
+                        for j in 0..8 {
+                            print!("{} ", block[i][j]);
+                        }
+                        println!("");
+                    }
+                }
             }
-            println!("");
         }
     }
-    fn decode(&mut self) {
+    fn dequantize(&mut self) {
         let sof_info = &self.jpeg_meta_data.sof_info;
         let component_infos = &sof_info.component_infos;
         let quant_tables = &self.jpeg_meta_data.quant_tables;
-
         for id in 0..3 {
             let c_info = &component_infos[id];
             for h in 0..(c_info.vertical_sampling as usize) {
                 for w in 0..(c_info.horizontal_sampling as usize) {
 
-                    // println!("原始 mcu");
-                    // self.display(id, h, w);
-                    // 反量化
                     for i in 0..8 {
                         for j in 0..8 {
                             self.mcu[id][h][w][i][j] *= quant_tables[c_info.quant_table_id as usize][i*8 + j];
                         }
                     }
-                    // println!("反量化之後");
-                    // self.display(id, h, w);
-                    // zigzag
+
+                }
+            }
+        }
+    }
+    fn zigzag(&mut self) {
+        let sof_info = &self.jpeg_meta_data.sof_info;
+        let component_infos = &sof_info.component_infos;
+        for id in 0..3 {
+            let c_info = &component_infos[id];
+            for h in 0..(c_info.vertical_sampling as usize) {
+                for w in 0..(c_info.horizontal_sampling as usize) {
+
                     let mut tmp: [[f32; 8]; 8] = Default::default();
                     for i in 0..8 {
                         for j in 0..8 {
@@ -90,10 +106,22 @@ impl<'a> MCUWrap<'a> {
                         }
                     }
                     self.mcu[id][h][w] = tmp;
-                    // println!("zigzag 之後");
-                    // self.display(id, h, w);
-                    // 反向離散餘弦變換（idct）
-                    tmp = Default::default();
+
+                }
+            }
+        }
+    }
+    // NOTE: idct 直接照定義展開
+    // 可嘗試其他優化方法
+    fn idct(&mut self) {
+        let sof_info = &self.jpeg_meta_data.sof_info;
+        let component_infos = &sof_info.component_infos;
+        for id in 0..3 {
+            let c_info = &component_infos[id];
+            for h in 0..(c_info.vertical_sampling as usize) {
+                for w in 0..(c_info.horizontal_sampling as usize) {
+
+                    let mut tmp: [[f32; 8]; 8] = Default::default();
                     for i in 0..8 {
                         for j in 0..8 {
                             for x in 0..8 {
@@ -107,11 +135,31 @@ impl<'a> MCUWrap<'a> {
                         }
                     }
                     self.mcu[id][h][w] = tmp;
-                    // println!("離散餘弦變換之後");
-                    // self.display(id, h, w);
+
                 }
             }
         }
+    }
+    // NOTE: dequantize, zigzag, idct 的外層迴圈其實是一樣的
+    // 把它們寫在一起可以更有效率、也可以節省很多程式碼行數
+    // 但此處爲了能夠將每個階段的狀態都打印出來，將每個階段都寫成函式
+    fn decode(&mut self) {
+        self.dequantize();
+        self.zigzag();
+        self.idct();
+    }
+    fn show_all_stage(&mut self) {
+        println!("---------------- 未經處理 ----------------");
+        self.display();
+        self.dequantize();
+        println!("---------------- 反量化之後 ----------------");
+        self.display();
+        self.zigzag();
+        println!("---------------- zigzag 之後 ----------------");
+        self.display();
+        self.idct();
+        println!("---------------- 反向餘弦變換之後 ----------------");
+        self.display();
     }
     fn toRGB(&mut self) -> Vec<Vec<Color>> {
         self.decode();
@@ -172,8 +220,13 @@ pub fn decoder(reader: BufReader<File>) -> Image {
             }
         }
     }
-    println!("rgb: {:?}", image.pixels[0][0]);
 
-    // MCUWrap::new(MCUs[20][20].clone(), &jpeg_meta_data).toRGB();
     return image;
+}
+
+pub fn show_mcu_stage(reader: BufReader<File>, h: usize, w: usize) {
+    let (jpeg_meta_data, MCUs) = data_reader(reader);
+    let mcu = MCUs[h][w].clone();
+    let mut mcu_wrap = MCUWrap::new(mcu, &jpeg_meta_data);
+    mcu_wrap.show_all_stage();
 }

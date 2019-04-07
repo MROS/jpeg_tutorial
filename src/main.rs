@@ -1,45 +1,48 @@
 mod image;
-mod display;
+mod ppm;
 mod decoder;
 mod marker;
 mod reader;
 mod primitives;
 
 use image::Image;
-use display::{display_image, to_ppm};
-use decoder::decoder;
+use ppm::to_ppm;
+use decoder::{decoder,show_mcu_stage};
 use marker::marker_detector;
 use reader::data_reader;
 
 use std::fs::File;
 use std::io::BufReader;
 
+use std::str::FromStr;
+
 extern crate clap;
-use clap::{Arg, App};
+use clap::{App, Arg, SubCommand};
 
 fn main() -> std::io::Result<()> {
     let matches = App::new("JPEG tutorial")
                           .author("MROS. <yc1043@gmail.com>")
-                          .about("跟我寫 JPEG 解碼器")
+                          .about("「跟我寫 JPEG 解碼器」系列文配套程式碼")
                           .arg(Arg::with_name("path")
-                               .help("要解析的 JPEG 檔案路徑")
-                               .required(true)
-                               .index(1))
-                          .arg(Arg::with_name("marker")
-                               .short("m")
-                               .long("marker")
-                               .multiple(true)
-                               .help("僅打印 marker"))
-                          .arg(Arg::with_name("ppm")
-                               .short("p")
-                               .long("ppm")
-                               .multiple(true)
-                               .help("輸出 bmp"))
-                          .arg(Arg::with_name("reader")
-                               .short("r")
-                               .long("reader")
-                               .multiple(true)
-                               .help("僅解碼檔案，不顯示"))
+                               .help("JPEG 檔的路徑")
+                               .index(1)
+                               .required(true))
+                          .subcommand(SubCommand::with_name("marker")
+                               .about("僅打印 marker"))
+                          .subcommand(SubCommand::with_name("reader")
+                               .about("解碼檔案並打印各區段"))
+                          .subcommand(SubCommand::with_name("ppm")
+                               .about("輸出 ppm 格式，檔名固定爲 out.ppm"))
+                          .subcommand(SubCommand::with_name("mcu")
+                               .about("打印 mcu 解碼的各階段")
+                               .arg(Arg::with_name("y")
+                                    .help("想取得的 mcu 的縱座標，由上往下")
+                                    .required(true)
+                                    .index(1))
+                               .arg(Arg::with_name("x")
+                                    .help("想取得的 mcu 的橫座標，由左往右")
+                                    .required(true)
+                                    .index(2)))
                           .get_matches();
 
     let filename = matches.value_of("path").unwrap();
@@ -47,17 +50,30 @@ fn main() -> std::io::Result<()> {
     let f = File::open(filename)?;
     let reader = BufReader::new(f);
 
-    if matches.is_present("marker") {
-        marker_detector(reader)?;
-    } else if matches.is_present("reader") {
-        data_reader(reader);
-    } else if matches.is_present("ppm") {
-        let image: Image = decoder(reader);
-        to_ppm(image)?;
-    } else {
-        // 沒有額外參數，直接解碼並顯示
-        let image: Image = decoder(reader);
-        display_image(image);
+    match matches.subcommand_name() {
+        Some("marker") => {
+            marker_detector(reader)?;
+        }
+        Some("reader") => {
+            data_reader(reader);
+        }
+        Some("ppm") => {
+            let image: Image = decoder(reader);
+            to_ppm(image)?;
+        }
+        Some("mcu") => {
+            let y = matches.subcommand_matches("mcu").unwrap().value_of("y").unwrap();
+            let x = matches.subcommand_matches("mcu").unwrap().value_of("x").unwrap();
+            println!("{} {}", y, x);
+            show_mcu_stage(reader, FromStr::from_str(y).unwrap(), FromStr::from_str(x).unwrap());
+        }
+        None        => {
+            let image: Image = decoder(reader);
+            to_ppm(image)?;
+        }
+        Some(_) => {
+            println!("unrechable");
+        }
     }
 
     Ok(())
