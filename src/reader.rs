@@ -32,13 +32,13 @@ const AC: u8 = 0x01;
 
 fn read_u8(reader:&mut BufReader<File>) -> u8 {
     let mut c: [u8; 1] = [0; 1];
-    reader.read_exact(&mut c);
+    reader.read_exact(&mut c).expect("read_u8 失敗");
     return c[0];
 }
 
 fn read_u16(reader: &mut BufReader<File>) -> u16 {
     let mut c: [u8; 2] = [0; 2];
-    reader.read_exact(&mut c);
+    reader.read_exact(&mut c).expect("read_u16 失敗");
     return (c[0] as u16) * 256 + c[1] as u16;
 }
 
@@ -47,7 +47,7 @@ fn read_app0(reader: &mut BufReader<File>) -> AppInfo {
     let len = read_u16(reader);
     println!("區段長度 {} bytes", len);
     let mut app_info: AppInfo = Default::default();
-    reader.read_exact(&mut app_info.identifier);
+    reader.read_exact(&mut app_info.identifier).expect("read_app0 失敗");
 
     app_info.version_major_id = read_u8(reader);
     app_info.version_minor_id = read_u8(reader);
@@ -62,7 +62,7 @@ fn read_app0(reader: &mut BufReader<File>) -> AppInfo {
 
     // 不管 thumbnail
     let thumbnail_length: i64 = 3 * (app_info.x_thumbnail as i64) * (app_info.y_thumbnail as i64);
-    reader.seek(SeekFrom::Current(thumbnail_length));
+    reader.seek(SeekFrom::Current(thumbnail_length)).expect("seek in read_app0 失敗");
 
     return app_info;
 }
@@ -85,7 +85,7 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
         let id = c & 0x0F;
         let mut map = HashMap::new();
         let mut height_info: [u8; 16] = [0; 16];
-        reader.read_exact(&mut height_info);
+        reader.read_exact(&mut height_info).expect("read height_info in dqt 失敗");
         println!("{:?}", height_info);
         len -= 17;
 

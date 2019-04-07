@@ -1,8 +1,6 @@
 use std::io::BufReader;
 use std::fs::File;
 use std::io::Read;
-use std::io::Seek;
-use std::io::SeekFrom;
 
 fn marker_info(marker: u8) -> String {
     match marker {
@@ -17,7 +15,7 @@ fn marker_info(marker: u8) -> String {
 
 fn read_u16(reader: &mut BufReader<File>) -> u16 {
     let mut c: [u8; 2] = [0; 2];
-    reader.read_exact(&mut c);
+    reader.read_exact(&mut c).expect("read_u16 失敗");
     return (c[0] as u16) * 256 + c[1] as u16;
 }
 

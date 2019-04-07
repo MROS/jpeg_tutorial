@@ -41,6 +41,7 @@ pub fn display_image(image: Image) {
             }
         }
     }
+
     canvas.present();
 
     // 按 Esc 退出
