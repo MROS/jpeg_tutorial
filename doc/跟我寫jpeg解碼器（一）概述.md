@@ -17,7 +17,7 @@ JPEG 這個標準其實定義了多種壓縮算法以及編碼方式，也就是
 
 （聲明：圖片來自[此網站](https://www.biaodianfu.com/progressive-jpeg.html)）
 
-sequential 會由上而下解碼（其實也可以沿其他方向）
+sequential 會由上而下解碼
 
 ![sequential](./image/sequential.gif)
 
@@ -36,15 +36,15 @@ progressive 則在解碼的過程中，從模糊漸漸變得清晰
 
 除了壓縮算法跟編碼方式之外，還有一些參數可以調整，此處介紹一個較爲重要的：數據的精度。精度就是採樣時分割的細粒程度，譬如說，體重計能量測 0 ~ 128 公斤，那 8bit 的精度就足以採樣到 0.5 公斤的誤差。
 
-### baseline 流程
+### baseline
 
-所有 JPEG 規範組合中，最爲簡單的一種就是 baseline 流程，它
+所有 JPEG 規範組合中，最爲簡單的一種就是 baseline ，它
 
 - 循序（sequential）
 - 霍夫曼編碼
 - 精度爲 8bit
 
-雖然說它是最簡單的，但也是最常被使用了，提供個簡單的數據，我隨機從不同網站下載跟生成了七張圖片，其中就有六張使用了 baseline 流程，僅有一張採用了 progressive 的壓縮方式。
+它是最簡單，也最常被使用，提供個簡單的數據，我隨機從不同網站下載跟生成了七張圖片，其中就有六張使用了 baseline 流程，僅有一張採用了 progressive 的壓縮方式。
 
 簡單又常用，是再容易不過的教學題目了。在往後的文章中，我們就先專注在 baseline 流程的 JPEG 上。
 

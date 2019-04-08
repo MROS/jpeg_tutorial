@@ -14,7 +14,8 @@
 | SOS  |      |
 
 ## 範例程式碼：讀取各區段
-（待補位置）
+
+在配套源碼的 `src/reader.rs` 檔案中，`read_dqt`, `read_dht`, `read_sof0`, `read_sos` 分別讀取了這四個區段，讀者可自行參考。
 
 ## 讀取量化表（DHT）
 
