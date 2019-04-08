@@ -38,16 +38,19 @@ git clone https://github.com/MROS/jpeg_tutorial
 cd jpeg_tutorial
 cargo install --path .
 ```
+`cargo install` 會將編譯出的執行檔 `jpeg_tutorial` 放進 ~/.cargo/bin 之中，請確認 ~/.cargo/bin 已經在 $PATH 裡。
 
 ### 執行
 
 #### 轉檔爲 ppm 格式
 
+ppm 檔的預設檔名爲 out.ppm
+
 ``` sh
 jpeg_tutorial <jpeg_path> ppm
 ```
 
-或是不加子命令
+不加子命令，預設效果也是轉換爲 ppm
 
 ```sh
 jpeg_tutorial <jpeg_path>
