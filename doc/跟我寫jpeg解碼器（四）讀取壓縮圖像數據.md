@@ -94,7 +94,7 @@ new_j = j * Cb.vs / max_vs
 # 前兩階描述 block 的位置，後兩階描述要擷取的是這 8*8 中的哪一個點
 MCU[i][j].Cb = Cb[new_i / 8][new_j / 8][new_i % 8][new_j % 8]
 
-# Y, Cr 顏色分量與 Cb 顏色分量的對應方式完全相同，省略
+# Y, Cr 的算法跟 Cb 完全相同，省略之
 ```
 
 ## 讀取 SOF0 區段

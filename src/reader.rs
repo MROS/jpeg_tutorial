@@ -106,35 +106,44 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
     return ret;
 }
 
-fn read_dqt(reader: &mut BufReader<File>) -> (usize, [f32; 64]) {
-    let len = read_u16(reader);
+fn read_dqt(reader: &mut BufReader<File>) -> Vec<(usize, [f32; 64])> {
+    let mut len = read_u16(reader);
     println!("區段長度 {} bytes", len);
-    let c = read_u8(reader);
-    let id = c & 0x0F;
-    let precision = c >> 4;
-    println!("量化表 {} ，精度爲 {}", id, precision);
+    len -= 2;  // 扣掉自身長度
 
-    let mut table = [0.0; 64];
-    if precision == 0 {
-        for i in 0..64 {
-           table[i] = f32::from(read_u8(reader));
+    let mut tables = Vec::new();
+    // 一個 dqt 區段中，可能包含多個量化表
+    while len > 0 {
+        let c = read_u8(reader);
+        let id = c & 0x0F;
+        let precision = c >> 4;
+        println!("量化表 {} ，精度爲 {}", id, precision);
+
+        let mut table = [0.0; 64];
+        if precision == 0 {
+            for i in 0..64 {
+                table[i] = f32::from(read_u8(reader));
+            }
+            len -= 65
+        } else if precision == 1 {
+            for i in 0..64 {
+                table[i] = f32::from(read_u16(reader));
+            }
+            len -= 129;
+        } else {
+            println!("量化表 {} 精度爲 {}，不符合規範", id, precision);
         }
-    } else if precision == 1 {
-        for i in 0..64 {
-           table[i] = f32::from(read_u16(reader));
+
+        for i in 0..8 {
+            for j in 0..8 {
+                print!("{:2} ", table[i*8 + j]);
+            }
+            println!("");
         }
-    } else {
-        println!("量化表 {} 精度爲 {}，不符合規範", id, precision);
+        tables.push((id as usize, table));
     }
 
-    for i in 0..8 {
-        for j in 0..8 {
-            print!("{:2} ", table[i*8 + j]);
-        }
-        println!("");
-    }
-
-    return (id as usize, table);
+    return tables;
 }
 
 fn read_sof0_component(reader: &mut BufReader<File>) -> ComponentInfo {
@@ -409,8 +418,9 @@ pub fn data_reader(mut reader: BufReader<File>) -> (JPEGMetaData, Vec<Vec<MCU>>)
             },
             DQT_MARKER => {
                 println!("==================  掃過 DQT ====================");
-                let (id, table) = read_dqt(&mut reader);
-                jpeg_meta_data.quant_tables[id] = table;
+                for (id, table) in read_dqt(&mut reader) {
+                    jpeg_meta_data.quant_tables[id] = table;
+                }
             },
             m => {
                 println!("other marker: {:#X?}", m);
