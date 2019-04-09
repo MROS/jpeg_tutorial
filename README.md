@@ -74,7 +74,7 @@ jpeg_tutorial <jpeg_path> marker
 jpeg_tutorial <jpeg_path> mcu <綜座標> <橫座標>
 ```
 
-假設有一張圖片寬度上有 12 個 mcu 、 高度上有 8 個 mcu ，用
+假設有一張圖片高度上有 8 個 mcu  、寬度上有 12 個 mcu ，用
 
 ```sh
 jpeg_tutorial <jpeg_path> mcu 7 11
