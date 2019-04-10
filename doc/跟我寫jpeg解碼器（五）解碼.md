@@ -16,7 +16,7 @@
 
 ## 反量化
 
-從 [DQT](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E4%B8%89%EF%BC%89%E8%AE%80%E5%8F%96%E9%87%8F%E5%8C%96%E8%A1%A8%E3%80%81%E9%9C%8D%E5%A4%AB%E6%9B%BC%E8%A1%A8.md#%E8%AE%80%E5%8F%96%E9%87%8F%E5%8C%96%E8%A1%A8dht) 區段中，讀出了量化表，在 [SOF0 區段](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E5%9B%9B%EF%BC%89%E8%AE%80%E5%8F%96%E5%A3%93%E7%B8%AE%E5%9C%96%E5%83%8F%E6%95%B8%E6%93%9A.md#%E8%AE%80%E5%8F%96-sof0-%E5%8D%80%E6%AE%B5)，知道了各個顏色分量所對應的量化表 id 。
+從 [DQT 區段](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E4%B8%89%EF%BC%89%E8%AE%80%E5%8F%96%E9%87%8F%E5%8C%96%E8%A1%A8%E3%80%81%E9%9C%8D%E5%A4%AB%E6%9B%BC%E8%A1%A8.md#%E8%AE%80%E5%8F%96%E9%87%8F%E5%8C%96%E8%A1%A8dht)中，讀出了量化表，在 [SOF0 區段](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E5%9B%9B%EF%BC%89%E8%AE%80%E5%8F%96%E5%A3%93%E7%B8%AE%E5%9C%96%E5%83%8F%E6%95%B8%E6%93%9A.md#%E8%AE%80%E5%8F%96-sof0-%E5%8D%80%E6%AE%B5)，知道了各個顏色分量所對應的量化表 id 。
 
 一個 block 跟一個量化表都是 8 * 8，將它們對應的位置相乘，就完成這個轉換了。虛擬碼如下：
 
@@ -73,7 +73,7 @@ $
 
 ## 升採樣
 
-參考 [mcu 與各分量如何對應](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E5%9B%9B%EF%BC%89%E8%AE%80%E5%8F%96%E5%A3%93%E7%B8%AE%E5%9C%96%E5%83%8F%E6%95%B8%E6%93%9A.md#mcu-%E8%88%87%E5%90%84%E5%88%86%E9%87%8F%E5%A6%82%E4%BD%95%E5%B0%8D%E6%87%89)一節，就可以得到 MCU 的任一個 pixel 對應的 Y, Cb, Cr 分量。
+參考 [mcu 與各分量如何對應](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E5%9B%9B%EF%BC%89%E8%AE%80%E5%8F%96%E5%A3%93%E7%B8%AE%E5%9C%96%E5%83%8F%E6%95%B8%E6%93%9A.md#mcu-%E8%88%87%E5%90%84%E5%88%86%E9%87%8F%E5%A6%82%E4%BD%95%E5%B0%8D%E6%87%89)一節，就可以得到 MCU 的任一個像素所對應的 Y, Cb, Cr 分量。
 
 ## YCbCr 轉 RGB
 
