@@ -86,7 +86,7 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
         let mut map = HashMap::new();
         let mut height_info: [u8; 16] = [0; 16];
         reader.read_exact(&mut height_info).expect("read height_info in dqt 失敗");
-        println!("{:?}", height_info);
+        println!("高度（碼字長度）分配 {:?}", height_info);
         len -= 17;
 
         let mut code = 0;
@@ -94,7 +94,12 @@ fn read_dht(reader: &mut BufReader<File>) -> Vec<(u8, u8, HashMap<(u8, u16), u8>
             for _ in 0..height_info[h] {
                 let source_symbol = read_u8(reader);
                 map.insert(((h + 1) as u8, code), source_symbol);
-                println!("{} {:#X}", code, source_symbol);
+
+                // 下幾行只是要讓輸出好看點
+                let binary = format!("{:b}", code);
+                let zeros = (h + 1) - binary.len();
+                println!("{}{} {:#04X}", "0".repeat(zeros), binary, source_symbol);
+
                 code += 1;
                 len -= 1;
             }
