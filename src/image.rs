@@ -1,4 +1,17 @@
-use sdl2::pixels::Color;
+#![allow(non_snake_case)]
+
+#[derive(Clone, Copy)]
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8
+}
+
+impl Color {
+    pub fn RGB(r: u8, g: u8, b: u8) -> Color {
+        return Color {r, g, b};
+    }
+}
 
 pub struct Image {
     pub width: u32,

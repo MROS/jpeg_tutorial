@@ -1,9 +1,6 @@
 #![allow(non_snake_case)]
 use crate::image::Image;
 
-extern crate sdl2;
-use sdl2::pixels::Color;
-
 use std::io::BufReader;
 use std::fs::File;
 
@@ -11,6 +8,7 @@ use std::f32::consts::PI;
 
 use crate::primitives::*;
 use crate::reader::data_reader;
+use crate::image::Color;
 
 fn cc(i: usize, j: usize) -> f32 {
     if i == 0 && j == 0 {

@@ -25,7 +25,6 @@
 ### 前置準備
 
 - 本配套程式碼以 rust 撰寫，請先安裝 [rust 工具鏈](https://www.rust-lang.org/tools/install)。
-- 安裝 libsdl2 ，通常可在發行版的套件管理器找到
 
 ### 下載程式碼
 ``` sh
