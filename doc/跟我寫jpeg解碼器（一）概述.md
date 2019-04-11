@@ -19,11 +19,11 @@ JPEG 這個標準其實定義了多種壓縮算法以及編碼方式，也就是
 
 sequential 會由上而下解碼
 
-![sequential](./image/sequential.gif)
+![sequential](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/sequential.gif)
 
 progressive 則在解碼的過程中，從模糊漸漸變得清晰
 
-![progressive](./image/progressive.gif)
+![progressive](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/progressive.gif)
 
 而 hierarchical 類似於 progressive 的效果，但用了更加激進的方式，它會分別對一張圖片的不同解析度進行編碼。
 
@@ -70,13 +70,13 @@ progressive 則在解碼的過程中，從模糊漸漸變得清晰
 
 先看一張最簡單的圖
 
-![編解碼略圖](./image/編解碼略圖.jpg)
+![編解碼略圖](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/%E7%B7%A8%E8%A7%A3%E7%A2%BC%E7%95%A5%E5%9C%96.jpg)
 
 相信這張圖非常簡單易懂，我們接著將壓縮與解壓縮的流程放大來看，baseline JPEG 會透過 DCT 變換，將原色彩空間映射到新空間，再使用霍夫曼編碼嘗試進行壓縮。
 
 解碼時則全部反過來，如下示意圖
 
-![編解碼略圖2](./image/編解碼略圖2.jpg)
+![編解碼略圖2](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/%E7%B7%A8%E8%A7%A3%E7%A2%BC%E7%95%A5%E5%9C%962.jpg)
 
 DCT 變換以及霍夫曼編碼，都是完全可逆的運算，也就是說這樣得到的壓縮檔是無損的，爲了進一步提高壓縮率， baseline JPEG 還會拋棄掉一些人類視覺上感受不明顯的資訊：
 
@@ -85,7 +85,7 @@ DCT 變換以及霍夫曼編碼，都是完全可逆的運算，也就是說這�
 
 以上這兩點都是有損的，是降低壓縮檔資料大小的最主要流程，加入這兩項之後，我們將示意圖更新爲
 
-![編解碼略圖3](./image/編解碼略圖3.jpg)
+![編解碼略圖3](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/%E7%B7%A8%E8%A7%A3%E7%A2%BC%E7%95%A5%E5%9C%963.jpg)
 
 這張圖差不多把 JPEG 編解碼的主要流程畫出來了，但要寫一個解碼器，這些知識是遠遠不夠的，我們仍得瞭解更多細節。
 

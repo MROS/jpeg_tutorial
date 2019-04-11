@@ -1,0 +1,6 @@
+- CCITT Rec. T.81 (1992 E) (標準書)
+- JPEG图像解码方案
+- Compressed image file formats: JPEG, PNG, GIF, XBM, BMP （強烈推薦！）
+- The Discrete Cosine Transform (DCT): Theory and Application
+- The JPEG Still Picture Compression Standard
+- 用「維持葉子高度，將樹盡可能右傾」來描述規範霍夫曼編碼，是我閱讀簡陋的[中文維基百科](https://zh.wikipedia.org/wiki/%E8%8C%83%E6%B0%8F%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%B7%A8%E7%A2%BC)之後，自行思考出來的理解方式，幸能將各種性質一一對上，於是一直沿用葉子節點的說法囉！
