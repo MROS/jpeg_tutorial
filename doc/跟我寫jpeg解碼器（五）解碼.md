@@ -33,7 +33,7 @@ for i in 0..8 {
 
 zigzag 時，會將一個 block 以下圖（截自標準書）的順序重新排列：
 
-![zigzag](image/zigzag.png)
+![zigzag](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/zigzag.png)
 
 反 zigzag 就是把這個過程還原回來。
 
@@ -93,6 +93,6 @@ let B = chomp(Y + 1.772*Cb + 128.0);
 
 ## 總結
 
-至此已經解出任一個 MCU 的 RGB 值了，將它們組合起來就能得到原圖啦！
+至此已經解出一個 MCU 的 RGB 值了，將圖像的各個 MCU 拼起來就能得到原圖啦！
 
-你可以嘗試用顯示圖形的函式庫把結果顯示出來，或是輸出到格式簡單的圖檔後再用看圖軟體打開，就可以直到自己的解碼是否正確了。我推薦 [ppm 格式](https://zh.wikipedia.org/wiki/PBM%E6%A0%BC%E5%BC%8F)，它真的超級簡單。
+你可以嘗試用能夠顯示圖形的函式庫把解碼完成的圖像顯示出來，或是輸出到格式簡單的圖檔後再用看圖軟體打開，就可以知道自己的解碼器是否正確運作。我推薦輸出成 [ppm 格式](https://zh.wikipedia.org/wiki/PBM%E6%A0%BC%E5%BC%8F)，它真的超級簡單。

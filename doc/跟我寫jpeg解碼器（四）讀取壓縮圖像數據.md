@@ -21,7 +21,7 @@ SOF0 會提供讀取 SOS 的必要資訊， SOS 所儲存的是整個 JPEG 檔�
 
 下方是圖示：
 
-![JPEG分塊](./image/JPEG分塊.jpg)
+![JPEG分塊](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/JPEG%E5%88%86%E5%A1%8A.jpg)
 
 一張圖片在壓縮時會被切割成多塊 MCU ， MCU 是 Minimum Coded Unit 的縮寫，意思是最小編碼單元。
 
@@ -35,7 +35,7 @@ SOF0 會提供讀取 SOS 的必要資訊， SOS 所儲存的是整個 JPEG 檔�
 
 我們用下面這幾張圖來解釋何謂採樣率、以及它如何影響 MCU 的組成。
 
-![MCU組成1](./image/MCU組成1.jpg)
+![MCU組成1](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/MCU%E7%B5%84%E6%88%901.jpg)
 
 這張圖片的 Y 顏色分量的水平、垂直採樣率爲 2 ， Cb, Cr 顏色分量的水平、垂直採樣率爲 1 。
 
@@ -60,7 +60,7 @@ MCU.height = 8 * max(Y.vs, Cb.vs, Cr.vs)
 
 如果把 Y 的 水平、垂直採樣率改爲 1 ，MCU 的寬、高爲 8 * max(1, 1, 1) = 8 。圖示如下：
 
-![MCU組成2](./image/MCU組成2.jpg)
+![MCU組成2](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/MCU%E7%B5%84%E6%88%902.jpg)
 
 ### MCU 與各分量如何對應？
 
@@ -72,7 +72,7 @@ MCU.height = 8 * max(Y.vs, Cb.vs, Cr.vs)
 
 按照採樣率來對應，例如下圖， Cb, Cr 的最左上角對應到了 MCU 的左上四個 px ：
 
-![MCU對應](./image/MCU對應.jpg)
+![MCU對應](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/MCU%E5%B0%8D%E6%87%89.jpg)
 
 用虛擬碼表示會更清晰：
 
@@ -152,13 +152,13 @@ SOF0 區段記錄了圖片寬、高，以及各個顏色分量的資訊，有了
 
 由左到右，再由上到下，圖示：
 
-![MCU 順序](./image/MCU順序.jpg)
+![MCU 順序](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/MCU%E9%A0%86%E5%BA%8F.jpg)
 
 #### 一個顏色分量內部各個 block 的順序
 
 一樣是由左到右，再由上到下，我直接截張標準書的圖：
 
-![block 順序](./image/block順序.jpg)
+![block 順序](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/block%E9%A0%86%E5%BA%8F.jpg)
 
 #### MCU 的數量
 
