@@ -320,7 +320,7 @@ fn read_mcus(reader: &mut BufReader<File>, jpeg_meta_data: &JPEGMetaData) -> Vec
 
     let w = (image_width - 1) / (8 * sof_info.max_horizontal_sampling as u16) + 1;     // 寬度上有 w 個 MCU
     let h = (image_height - 1) / (8 * sof_info.max_vertical_sampling as u16) + 1;   // 高度上有 h 個 MCU
-    println!("寬度上有 {} 個 MCU ，寬度上有 {} 個 MCU", w, h);
+    println!("寬度上有 {} 個 MCU ，高度上有 {} 個 MCU", w, h);
 
     let mut bits = BitStream::new(reader);
     let mut MCUs = vec![vec![Default::default(); w as usize]; h as usize];
@@ -330,6 +330,15 @@ fn read_mcus(reader: &mut BufReader<File>, jpeg_meta_data: &JPEGMetaData) -> Vec
         }
     }
     return MCUs;
+}
+
+fn component_name(id: u8) -> &'static str {
+    match id {
+        1 => "Y",
+        2 => "Cb",
+        3 => "Cr",
+        _ => panic!("不知名的顏色分量 id: {}", id)
+    }
 }
 
 // 在讀取 read_sos 之前， jpeg_data 的其他欄位都讀取好了
@@ -347,6 +356,7 @@ fn read_sos(reader: &mut BufReader<File>) -> [(usize, usize); 3] {
         let id = read_u8(reader);
         let dc_id = (id >> 4) as usize;
         let ac_id = (id & 0x0F) as usize;
+        println!("{} 顏色色分量，直流霍夫曼表 id = {}, 交流霍夫曼表 id = {}", component_name(component), dc_id, ac_id);
         // Y => 1, Cb => 2, Cr => 3 ，將它們減 1 使的陣列索引從 0 開始
         table_mapping[component as usize - 1] = (dc_id, ac_id);
     }
@@ -397,7 +407,6 @@ pub fn data_reader(mut reader: BufReader<File>) -> (JPEGMetaData, Vec<Vec<MCU>>)
                 println!("==================  掃過 SOS ====================");
                 jpeg_meta_data.table_mapping = read_sos(&mut reader);
                 MCUs = read_mcus(&mut reader, &jpeg_meta_data);
-                println!("sof_info: {:#?}", jpeg_meta_data.sof_info);
             },
             APP0_MARKER => {
                 println!("==================  掃過 APP0 ====================");
