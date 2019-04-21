@@ -1,5 +1,8 @@
 # 跟我寫 JPEG 解碼器
 
+## 真‧緣起
+下面這份緣起也不是假的，但爲什麼要寫系列文章，有更直接的原因，如果單純想要學習，就請跳過吧！**唯獨臺灣大學的同學**，請看過這篇文章[吳家麟，我教育你](https://city-of-infinity.com/app/b/%E5%85%AB%E5%8D%A6/a/%E5%90%B3%E5%AE%B6%E9%BA%9F%EF%BC%8C%E6%88%91%E6%95%99%E8%82%B2%E4%BD%A0?id=5cbcd478271ae627b77544ff) （[備份](https://hackmd.io/ctyDPW8dTIuHCaCDkgw-SQ?both)）之後，再繼續閱讀，感謝！
+
 ## 緣起
 幾年前曾用 C++ 寫過一次 [JPEG 解碼器](https://github.com/MROS/jpeg_decoder)，還記得當時網路上對 JPEG 格式的介紹都雜亂無章、少東缺西，而標準書爲求完整嚴謹，寫的是又臭又長。就沒有讓我趕快寫完作業的法子嗎？最後我在 github 上撈到了一份 python 寫的解碼器，透過追蹤這份程式碼，才好不容易地把網路文章寫的不清楚的地方弄懂了。
 
@@ -21,6 +24,9 @@
 - （附錄一）理論基礎
 - [（附錄二）優化技巧](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E9%99%84%E9%8C%84%E4%BA%8C%EF%BC%89%E5%84%AA%E5%8C%96%E6%8A%80%E5%B7%A7.md)
 - [（附錄三）參考資料](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E9%99%84%E9%8C%84%E4%B8%89%EF%BC%89%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99.md)
+
+## 閱讀數學式
+github 並不支援在 markdown 中寫數學式，建議 clone 本專案之後，以 [typora](https://typora.io/) （在 typora 的偏好設定中開啓行內數學式） 或是其他 markdown 閱讀軟體來閱讀，會有更佳的體驗。
 
 ## [配套程式碼](https://github.com/MROS/jpeg_tutorial)
 
