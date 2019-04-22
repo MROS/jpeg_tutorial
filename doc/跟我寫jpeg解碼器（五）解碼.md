@@ -61,15 +61,15 @@ for i in 0..8 {
 ## 反向 DCT 變換
 
 $
-result[i][j] = \sum{_{x=0} ^7}\sum{_{y=0} ^7}C_x C_y cos(\frac{(2i + 1)x\pi}{16}) cos (\frac{(2j + 1)y\pi}{16}) block[x][y]
+result[i][j] = \frac{1}{4}\sum{_{x=0} ^7}\sum{_{y=0} ^7}C_x C_y cos(\frac{(2i + 1)x\pi}{16}) cos (\frac{(2j + 1)y\pi}{16}) block[x][y]
 $
 
-其中的 $C_i$ 定義如下
+其中的 $C_i​$ 定義如下
 
-$
-C_0 = \frac{1}{\sqrt{2}} \newline
-C_i = 1, \forall i > 0
-$
+$C_0 = \frac{1}{\sqrt{2}}​$
+
+$C_i = 1, \forall i > 0
+​$
 
 ## 升採樣
 
