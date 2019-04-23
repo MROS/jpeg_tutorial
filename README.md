@@ -11,7 +11,7 @@
 
 ## 章節說明
 
-爲了便於閱讀，爲了讓讀者有種過關斬將，一直有進度的感覺，我把整套解碼過程切割成五個章節，還有一章附錄講解 JPEG 的理論基礎。
+爲了便於閱讀，爲了讓讀者有種過關斬將，一直有進度的感覺，我把整套解碼過程切割成五個章節，還有附錄講解 JPEG 的理論基礎、優化技巧。
 
 - [（一）概述](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E4%B8%80%EF%BC%89%E6%A6%82%E8%BF%B0.md)：簡介 JPEG 解碼流程
 - [（二）讀取區段](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E4%BA%8C%EF%BC%89%E6%AA%94%E6%A1%88%E7%B5%90%E6%A7%8B.md)：簡介 JPEG 檔案結構
@@ -19,6 +19,8 @@
 - [（四）讀取壓縮圖像數據](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E5%9B%9B%EF%BC%89%E8%AE%80%E5%8F%96%E5%A3%93%E7%B8%AE%E5%9C%96%E5%83%8F%E6%95%B8%E6%93%9A.md)
 - [（五）解碼](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E4%BA%94%EF%BC%89%E8%A7%A3%E7%A2%BC.md)
 - （附錄一）理論基礎
+- [（附錄二）優化技巧](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E9%99%84%E9%8C%84%E4%BA%8C%EF%BC%89%E5%84%AA%E5%8C%96%E6%8A%80%E5%B7%A7.md)
+- [（附錄三）參考資料](https://github.com/MROS/jpeg_tutorial/blob/master/doc/%E8%B7%9F%E6%88%91%E5%AF%ABjpeg%E8%A7%A3%E7%A2%BC%E5%99%A8%EF%BC%88%E9%99%84%E9%8C%84%E4%B8%89%EF%BC%89%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99.md)
 
 ## [配套程式碼](https://github.com/MROS/jpeg_tutorial)
 
