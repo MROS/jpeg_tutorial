@@ -88,8 +88,8 @@ max_vs = max(Y.vs, Cb.vs, Cr.vs)
 
 # 計算 i, j 縮小到 Cb 的大小時，應該索引爲多少
 # 注意此處的除號 "/" 都會捨去到整數
-new_i = i * Cb.hs / max_hs
-new_j = j * Cb.vs / max_vs
+new_i = i * Cb.vs / max_vs
+new_j = j * Cb.hs / max_hs
 
 # Cb 是一個四階陣列
 # 前兩階描述 block 的位置，後兩階描述要擷取的是這 8*8 中的哪一個點
