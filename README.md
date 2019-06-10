@@ -78,7 +78,7 @@ jpeg_tutorial <jpeg_path> marker
 #### 打印指定 mcu 在解碼過程的各階段狀態
 
 ```
-jpeg_tutorial <jpeg_path> mcu <綜座標> <橫座標>
+jpeg_tutorial <jpeg_path> mcu <縱座標> <橫座標>
 ```
 
 假設有一張圖片高度上有 8 個 mcu  、寬度上有 12 個 mcu ，用
