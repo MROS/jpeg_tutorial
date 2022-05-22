@@ -96,7 +96,7 @@
 | ②    | 16 bytes             | 第 n 個 byte 代表高度爲 n 時，霍夫曼樹有幾個葉子節點                                                         |
 | ③    | 葉子節點數量個 bytes | 代表葉子節點所對應的信源符號，葉子從低到高，從左到右                                                           |
 
-接下來拿個範例解說，以下是一個是一個霍夫曼表的 hex 表示
+接下來拿個範例解說，以下是一個霍夫曼表的 hex 表示
 
 ![霍夫曼表範例](https://raw.githubusercontent.com/MROS/jpeg_tutorial/master/doc/image/%E9%9C%8D%E5%A4%AB%E6%9B%BC%E8%A1%A8%E7%AF%84%E4%BE%8B.png)
 
